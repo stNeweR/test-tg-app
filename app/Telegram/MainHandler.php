@@ -33,17 +33,15 @@ class MainHandler extends WebhookHandler
     {
         if ($this->message->contact()->phoneNumber()) {
             $phoneNumber = $this->message->contact()->phoneNumber();
-
             $message = $this->service->register($phoneNumber, $this->message->from()->toArray());
-
             $this->reply($message);
         } else {
             $this->reply('None...');
         }
     }
 
-    public function verify(Stringable $text)
+    public function verify(string $code)
     {   
-        
+        $this->reply($this->service->verifyUser($this->message->from()->toArray(), $code));
     }
 }

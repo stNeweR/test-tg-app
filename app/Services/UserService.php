@@ -28,7 +28,28 @@ class UserService
         ]);
         Log::info(json_encode($user, JSON_UNESCAPED_UNICODE));
 
-        return 'SMS отправлено успешно!';
+        return 'SMS с кодом отправлено успешно! Выполните команду /verify и напишите после команды код который вы получили в смс';
+    }
+
+    public function verifyUser(array $user, $code)
+    {
+        Log::info(json_encode($user, JSON_UNESCAPED_UNICODE));
+
+        $findUser = User::query()->where('telegram_id', '=', $user['id'])->first();
+
+        if (!$findUser) {
+            return 'Пользователя нет в базе. Сначала выполните команду /start';
+        } 
+
+        if ($findUser->verify_code == $code) {
+            $findUser->update([
+                'phone_verified' => true
+            ]);
+            Log::info(json_encode($findUser->verify_code, JSON_UNESCAPED_UNICODE));
+            return 'Вы успешно авторизованы! Теперь все сообщения будут сохраняться в базу данных';
+        }    
+
+        return $code . ' - это не верный код. Проверьте пожалуйста смс или снова выолните команду /start.';
     }
 
     public function sendCode($phoneNumber, $code)
