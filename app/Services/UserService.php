@@ -38,7 +38,7 @@ class UserService
         $findUser = User::query()->where('telegram_id', '=', $user['id'])->first();
 
         if (!$findUser) {
-            return 'Пользователя нет в базе. Сначала выполните команду /start';
+            return 'Пользователя нет в базе. Сначала выполните команду /start и авторизуйтесь';
         } 
 
         if ($findUser->verify_code == $code) {
@@ -50,6 +50,19 @@ class UserService
         }    
 
         return $code . ' - это не верный код. Проверьте пожалуйста смс или снова выолните команду /start.';
+    }
+
+    public function checkUser($senderId)
+    {
+        $sender = User::query()->where('telegram_id', '=', $senderId)->first();
+
+        if (!$sender) {
+            return 'Пользователя нет в базе. Сначала выполните команду /start и авторизуйтесь';
+        }
+
+        Log::info(json_encode($sender->toArray(), JSON_UNESCAPED_UNICODE));
+
+        return $sender->phone_verified;
     }
 
     public function sendCode($phoneNumber, $code)

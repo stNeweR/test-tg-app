@@ -15,11 +15,11 @@ use Log;
 
 class MainHandler extends WebhookHandler
 {
-    public $service;
+    public $userService;
 
     public function __construct()
     {
-        $this->service = new UserService();
+        $this->userService = new UserService();
     }
 
     public function start()
@@ -31,17 +31,22 @@ class MainHandler extends WebhookHandler
 
     protected function handleChatMessage(Stringable $text): void
     {
-        if ($this->message->contact()->phoneNumber()) {
+        if ($this->message->contact()) {
             $phoneNumber = $this->message->contact()->phoneNumber();
-            $message = $this->service->register($phoneNumber, $this->message->from()->toArray());
+            $message = $this->userService->register($phoneNumber, $this->message->from()->toArray());
             $this->reply($message);
         } else {
-            $this->reply('None...');
+            if ($this->userService->checkUser($this->message->from()->id())) {
+                
+                $this->reply($text);
+            } else {
+                $this->reply('none!!!');
+            }
         }
     }
 
     public function verify(string $code)
     {   
-        $this->reply($this->service->verifyUser($this->message->from()->toArray(), $code));
+        $this->reply($this->userService->verifyUser($this->message->from()->toArray(), $code));
     }
 }
