@@ -19,19 +19,22 @@ sail up -d
 ```
 composer install
 ```
-5) Выполните команды для телеграм [бота](https://docs.defstudio.it/telegraph/v1/index)
 
-6) Сделайте аккаунт на [SMS Aero](https://smsaero.ru/) (там дается 10 бесплатных смс для тестирования)
+5) Вам нужно как-то получить ssl сертификат. Можно использовать [ngrok](https://ngrok.com/) или [tuna](https://tuna.am/)
 
-7) Задайте значние переменным в .env файле 
+6) Выполните команды для телеграм [бота](https://docs.defstudio.it/telegraph/v1/index)
+
+7) Сделайте аккаунт на [SMS Aero](https://smsaero.ru/) (там дается 10 бесплатных смс для тестирования)
+
+8) Задайте значние переменным в .env файле 
 ```
 SMS_AERO_KEY=ключ от sms aero
 SMS_AERO_MAIL=логин от sms aero
 ```
 
-8) Выполните команды для [Moonshine](https://moonshine-laravel.com/docs/resource/getting-started/installation)
+10) Выполните команды для [Moonshine](https://moonshine-laravel.com/docs/resource/getting-started/installation)
 
-9) Выполните все миграции командой 
+11) Выполните все миграции командой 
 ```
 sail artisan migrate
 ```
