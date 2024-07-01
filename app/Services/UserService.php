@@ -2,8 +2,10 @@
 
 namespace App\Services;
 use App\Models\User;
+use DefStudio\Telegraph\Facades\Telegraph;
 use GuzzleHttp\Client;
 use Log;
+
 
 class UserService
 {
@@ -37,9 +39,17 @@ class UserService
 
         $findUser = User::query()->where('telegram_id', '=', $user['id'])->first();
 
+        if ($findUser->phone_verified) {
+            return 'Пользователь уже авторизован. Теперь все ваши сообщения будут сохраняться в бд.';
+        }
+
         if (!$findUser) {
             return 'Пользователя нет в базе. Сначала выполните команду /start и авторизуйтесь';
         } 
+
+        if ($code === '/verify') {
+            return 'Вы не ввели код из смс. А если смс не пришла, то снова воспользуйтесь командой /start.';
+        }
 
         if ($findUser->verify_code == $code) {
             $findUser->update([
@@ -54,15 +64,34 @@ class UserService
 
     public function checkUser($senderId)
     {
-        $sender = User::query()->where('telegram_id', '=', $senderId)->first();
+        $sender = User::query()->where('telegram_id', '=', $senderId)->get();
 
-        if (!$sender) {
-            return 'Пользователя нет в базе. Сначала выполните команду /start и авторизуйтесь';
+        Log::info(json_encode($sender->first(), JSON_UNESCAPED_UNICODE));
+
+        if ($sender->isEmpty()) {
+            return [
+                'result' => false,
+                'message' => 'Пользователя нет в базе данных.'
+            ];
         }
 
-        Log::info(json_encode($sender->toArray(), JSON_UNESCAPED_UNICODE));
+        // Log::info(json_encode($sender->toArray(), JSON_UNESCAPED_UNICODE));
 
-        return $sender->phone_verified;
+        $sender = $sender->first();
+
+        if ($sender->phone_verified === false) {
+            return [
+                'result' => false,
+                'message' => 'Пользователь есть в базе данных, но не авторизован. Сообщения ну будут записаны в бд. Выполните команду /verify и введите код который вы получили в смс.'
+            ];
+        }
+
+        Log::info('11111');
+
+        return [
+            'result' => true,
+            'user_id' => $sender->id
+        ];
     }
 
     public function sendCode($phoneNumber, $code)

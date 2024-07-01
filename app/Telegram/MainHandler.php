@@ -2,6 +2,7 @@
 
 namespace App\Telegram;
 
+use App\Services\MessageService;
 use App\Services\UserService;
 use DefStudio\Telegraph\Facades\Telegraph;
 use DefStudio\Telegraph\Handlers\WebhookHandler;
@@ -31,16 +32,26 @@ class MainHandler extends WebhookHandler
 
     protected function handleChatMessage(Stringable $text): void
     {
+        // Log::info(json_encode($this->message, JSON_UNESCAPED_UNICODE));
+
         if ($this->message->contact()) {
             $phoneNumber = $this->message->contact()->phoneNumber();
             $message = $this->userService->register($phoneNumber, $this->message->from()->toArray());
             $this->reply($message);
         } else {
-            if ($this->userService->checkUser($this->message->from()->id())) {
-                
-                $this->reply($text);
+            $result = $this->userService->checkUser($this->message->from()->id());
+            Log::info(json_encode($result, JSON_UNESCAPED_UNICODE));
+            // Log::info($result);
+
+            if (!$result['result']) {
+                $this->reply($result['message']);
+            } 
+
+            if ($result['result']) {
+                Log::info(json_encode($text, JSON_UNESCAPED_UNICODE));
+                MessageService::saveMessage($text, $result['user_id']);
             } else {
-                $this->reply('none!!!');
+                $this->reply('Ваши сообщения не сохраняються в бд.');
             }
         }
     }
