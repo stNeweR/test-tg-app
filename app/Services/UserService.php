@@ -20,6 +20,17 @@ class UserService
             return 'Ошибка при отправке SMS.';
         } 
         
+        $checkUser = User::query()->where('telegram_id', '=', $userData['id'])->get();
+
+        if ($checkUser->isNotEmpty()) {
+            $checkUser->first()->update([
+                'verify_code' => $verifyCode,
+                'phone_verified' => false
+            ]);
+
+            return 'Вы уже были авторизованы в системе. Мы выслали вам новый код подтверждения. Пока вы не выиполните команду /verify с этим кодом выши сообщения не будут записаны ';
+        }
+
         $user = User::create([
             'first_name' => $userData['first_name'],
             'last_name' => $userData['last_name'],
