@@ -86,7 +86,7 @@ class UserService
             ];
         }
 
-        // Log::info(json_encode($sender->toArray(), JSON_UNESCAPED_UNICODE));
+        Log::info(json_encode($sender->toArray(), JSON_UNESCAPED_UNICODE));
 
         $sender = $sender->first();
 

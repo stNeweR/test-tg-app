@@ -45,13 +45,17 @@ class MainHandler extends WebhookHandler
 
             if (!$result['result']) {
                 $this->reply($result['message']);
+                return;
             } 
 
             if ($result['result']) {
                 Log::info(json_encode($text, JSON_UNESCAPED_UNICODE));
                 MessageService::saveMessage($text, $result['user_id']);
+                // $this->reply($text);
+                return;
             } else {
                 $this->reply('Ваши сообщения не сохраняються в бд.');
+                return;
             }
         }
     }
